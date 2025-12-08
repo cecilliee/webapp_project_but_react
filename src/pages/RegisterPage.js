@@ -77,7 +77,7 @@ function RegisterPage() {
               name="fullName" // <-- Quan trọng: name phải khớp với key trong state
               required
               placeholder="e.g., Minh Nguyễn"
-              value={formData.fullName} // <-- Kết nối với state
+              value={formData.username} // <-- Kết nối với state
               onChange={handleChange} // <-- Kết nối với state
             />
           </div>
