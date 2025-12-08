@@ -1,7 +1,65 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react"; // <-- 1. Import useState
+import { Link, useNavigate } from "react-router-dom";
 
 function RegisterPage() {
+  const navigate = useNavigate(); // Hook để chuyển trang
+  // 2. Tạo state để lưu dữ liệu từ các ô input
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "", // <-- ĐÃ THÊM
+  });
+
+  // 3. Hàm này được gọi mỗi khi người dùng gõ chữ vào một ô input
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // 4. Hàm này được gọi khi người dùng nhấn nút "Create Account"
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    // Dữ liệu mới đã khớp với back-end
+    const registrationData = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone, // <-- ĐÃ THÊM
+      role: "USER", // <-- Gửi giá trị mặc định
+    };
+
+    try {
+      // Gửi yêu cầu đến URL chính xác
+      const response = await fetch("http://localhost:8080/api/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registrationData),
+      });
+
+      // Xử lý kết quả trả về (thành công hoặc thất bại)
+      const resultText = await response.text();
+      if (!response.ok) {
+        throw new Error(resultText || "Registration failed");
+      }
+
+      alert(resultText); // Hiển thị "SIGNUP SUCCESS ..."
+      navigate("login"); // Chuyển hướng sang trang đăng nhập sau khi đăng ký thành công
+    } catch (error) {
+      console.error("Error:", error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
   return (
     <div className="auth-page">
       <div className="form-container">
@@ -9,15 +67,18 @@ function RegisterPage() {
         <p className="form-subtitle">
           Join us and get access to the world's finest cars.
         </p>
-        <form id="register-form" className="auth-form">
+        {/* 5. Kết nối hàm handleSubmit với form */}
+        <form id="register-form" className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name">Full Name</label>
             <input
               type="text"
               id="name"
-              name="name"
+              name="fullName" // <-- Quan trọng: name phải khớp với key trong state
               required
               placeholder="e.g., Minh Nguyễn"
+              value={formData.fullName} // <-- Kết nối với state
+              onChange={handleChange} // <-- Kết nối với state
             />
           </div>
           <div className="form-group">
@@ -28,6 +89,20 @@ function RegisterPage() {
               name="email"
               required
               placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              type="tel" // type="tel" là chuẩn cho số điện thoại
+              id="phone"
+              name="phone"
+              required
+              placeholder="e.g., 0913817818"
+              value={formData.phone}
+              onChange={handleChange}
             />
           </div>
           <div className="form-group">
@@ -38,6 +113,8 @@ function RegisterPage() {
               name="password"
               required
               placeholder="Choose a strong password"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
           <div className="form-group">
@@ -45,9 +122,11 @@ function RegisterPage() {
             <input
               type="password"
               id="confirm-password"
-              name="confirm-password"
+              name="confirmPassword"
               required
               placeholder="Re-enter your password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
             />
           </div>
           <button type="submit" className="btn btn-accent btn-block">
@@ -56,9 +135,6 @@ function RegisterPage() {
         </form>
         <p className="form-switch-link">
           Already have an account? <Link to="/login">Log In</Link>
-          <br />
-          <br />
-          <Link to="/">Back to Home</Link>
         </p>
       </div>
     </div>

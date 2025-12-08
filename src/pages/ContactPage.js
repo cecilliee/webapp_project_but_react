@@ -10,7 +10,7 @@ function ContactPage() {
     alert("Thank you for your message! We'll get back to you within 24 hours.");
     e.target.reset();
   };
-
+  /* Sửa lại code để đẹp hơn */
   return (
     <section className="contact-page">
       <div className="container">

@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Import the Layout wrapper component
 import Layout from "./components/Layout";
+import AdminLayout from "./components/AdminLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Import all the Page components
 import HomePage from "./pages/HomePage";
@@ -12,6 +14,10 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+
+// Import Admin pages
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import UserManagementPage from "./pages/UserManagementPage";
 
 // The main App component that defines all the routes
 function App() {
@@ -39,6 +45,27 @@ function App() {
 
           {/* Optional: A "catch-all" route for 404 pages */}
           {/* <Route path="*" element={<NotFoundPage />} /> */}
+        </Route>
+
+        {/* Admin Routes - Protected với AdminLayout */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireAdmin={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          {/* Dashboard mặc định cho /admin */}
+          <Route index element={<AdminDashboardPage />} />
+          
+          {/* Trang quản lý người dùng */}
+          <Route path="users" element={<UserManagementPage />} />
+          
+          {/* Các trang admin khác sẽ được thêm sau */}
+          {/* <Route path="cars" element={<CarManagementPage />} /> */}
+          {/* <Route path="bookings" element={<BookingManagementPage />} /> */}
+          {/* <Route path="settings" element={<SettingsPage />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>
