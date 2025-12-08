@@ -5,7 +5,7 @@ function RegisterPage() {
   const navigate = useNavigate(); // Hook để chuyển trang
   // 2. Tạo state để lưu dữ liệu từ các ô input
   const [formData, setFormData] = useState({
-    fullName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
