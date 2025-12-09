@@ -14,14 +14,14 @@ function ProtectedRoute({ children, requireAdmin = true }) {
   // Kiểm tra xem người dùng đã đăng nhập chưa
   const isAuthenticated = () => {
     const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
+    const user = localStorage.getItem("username");
     return !!(token && user);
   };
 
   // Kiểm tra xem người dùng có quyền admin không
   const isAdmin = () => {
     const adminStatus = localStorage.getItem("isAdmin");
-    const user = localStorage.getItem("user");
+    const user = localStorage.getItem("username");
 
     // Nếu có flag isAdmin trong localStorage
     if (adminStatus === "true") {

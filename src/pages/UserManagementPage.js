@@ -13,10 +13,21 @@ function UserManagementPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await userService.getAll();
-      setUsers(data);
+      const response = await userService.getAll();
+      // Xử lý trường hợp API trả về object với data property
+      if (Array.isArray(response)) {
+        setUsers(response);
+      } else if (response.data && Array.isArray(response.data)) {
+        setUsers(response.data);
+      } else if (response.code === 1000 && Array.isArray(response.data)) {
+        setUsers(response.data);
+      } else {
+        console.error("Unexpected response format:", response);
+        setUsers([]);
+      }
     } catch (error) {
       console.error(error);
+      setUsers([]); // Đảm bảo users luôn là mảng
     } finally {
       setLoading(false);
     }
@@ -50,7 +61,9 @@ function UserManagementPage() {
       try {
         await userService.delete(id);
         // Cập nhật giao diện ngay lập tức
-        setUsers(users.filter((u) => u.id !== id));
+        if (Array.isArray(users)) {
+          setUsers(users.filter((u) => u.id !== id));
+        }
       } catch (error) {
         alert(error.message);
       }
@@ -58,13 +71,15 @@ function UserManagementPage() {
   };
 
   // 5. SEARCH: Logic lọc (Client-side)
-  const filteredUsers = users.filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.phone &&
-        user.phone.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredUsers = Array.isArray(users)
+    ? users.filter(
+        (user) =>
+          user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (user.phone &&
+            user.phone.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    : [];
 
   // 6. Handlers cho form
   const handleOpenForm = (user = null) => {

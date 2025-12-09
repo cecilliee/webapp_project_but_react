@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -27,21 +28,57 @@ function LoginPage() {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/authentication/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(loginData),
+        }
+      );
 
-      const resultText = await response.text();
+      const resultText = await response.json();
 
       if (!response.ok) {
-        throw new Error(resultText || "Login failed");
+        throw new Error(
+          resultText.message || resultText.error || "Login failed"
+        );
       }
 
-      alert(resultText); // Hiển thị "LOGIN SUCCESS..."
-      // TODO: Lưu lại token xác thực và chuyển hướng đến trang dashboard
-      // navigate('/dashboard');
+      if (resultText.code === 1000) {
+        const token = resultText.data.token;
+
+        // Bước 1: Lưu token vào localStorage
+        localStorage.setItem("token", token);
+
+        // Bước 2: Chuyển hướng đến trang dashboard
+        const decodedToken = jwtDecode(token);
+        console.log("Thông tin người dùng: ", decodedToken);
+        // sẽ thấy User hoặc admin trong console
+
+        localStorage.setItem("userRole", decodedToken.scope);
+        localStorage.setItem("username", decodedToken.sub);
+
+        alert("Login successful!");
+
+        //Chuyển hướng đến trang dashboard nếu là admin
+        if (decodedToken.scope === "ADMIN") {
+          console.log("User is Admin");
+          localStorage.setItem("isAdmin", "true"); // <--- DÒNG QUAN TRỌNG NHẤT
+          localStorage.setItem("userRole", "ADMIN");
+          navigate("/admin");
+          alert("Login successful as Admin!");
+        } else {
+          console.log("User is Customer");
+          localStorage.removeItem("isAdmin"); // Xóa cờ admin nếu có từ phiên trước
+          localStorage.setItem("userRole", "USER");
+
+          alert("Login successful!");
+          navigate("/user/dashboard");
+        }
+      } else {
+        throw new Error(resultText.message || "Login failed");
+      }
     } catch (error) {
       console.error("Error:", error);
       alert(`Error: ${error.message}`);

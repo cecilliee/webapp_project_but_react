@@ -34,6 +34,7 @@ const userService = {
   },
   create: async (user) => {
     const response = await fetch(API_URL, {
+      // <-- Gửi vào http://localhost:8080/api/users
       method: "POST",
       headers: getAuthHeader(),
       body: JSON.stringify(user),
@@ -44,7 +45,7 @@ const userService = {
     return response.json();
   },
   update: async (id, user) => {
-    const response = await fetch(`${API_URL}/${id}`, {
+    const response = await fetch(API_URL, {
       method: "PUT",
       headers: getAuthHeader(),
       body: JSON.stringify(user),
@@ -55,7 +56,7 @@ const userService = {
     return response.json();
   },
   delete: async (id) => {
-    const response = await fetch(`${API_URL}/${id}`, {
+    const response = await fetch(API_URL, {
       method: "DELETE",
       headers: getAuthHeader(),
     });

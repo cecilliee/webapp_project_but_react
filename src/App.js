@@ -58,10 +58,10 @@ function App() {
         >
           {/* Dashboard mặc định cho /admin */}
           <Route index element={<AdminDashboardPage />} />
-          
+
           {/* Trang quản lý người dùng */}
           <Route path="users" element={<UserManagementPage />} />
-          
+
           {/* Các trang admin khác sẽ được thêm sau */}
           {/* <Route path="cars" element={<CarManagementPage />} /> */}
           {/* <Route path="bookings" element={<BookingManagementPage />} /> */}
